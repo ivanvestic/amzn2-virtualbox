@@ -1,0 +1,12 @@
+# config.yaml override example
+vagrantfile:
+    vm:
+        provider:
+            local:
+                machines:
+                    vvplm:
+                        memory: '1024'
+                        cpus: '2'
+#    ssh:
+#        username: vagrant
+#        password: vagrant

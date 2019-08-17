@@ -1,0 +1,75 @@
+#cloud-config
+
+# Docs
+# @link https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/amazon-linux-2-virtual-machine.html
+# @link https://cloudinit.readthedocs.io/en/latest/topics/examples.html
+# @link https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/installation_and_configuration_guide/setting_up_cloud_init
+# @link https://github.com/hashicorp/vagrant/tree/master/keys
+# @link https://github.com/dotless-de/vagrant-vbguest
+# @link https://github.com/poflynn/AMZN2Vagrant
+# @link https://bosh.io/docs/cloud-config/
+# @link https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/EBSVolumeTypes.html
+#
+# @see /etc/cloud/cloud.cfg
+
+#disk_types:
+#- name: default
+#  # 40 GB
+#  disk_size: 40000
+#  cloud_properties:
+#    type: gp2
+
+# Add users to the system
+users:
+  - default
+  - name: vagrant
+    groups: wheel
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    plain_text_passwd: vagrant
+    ssh-authorized-keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
+    lock_passwd: false
+
+# User passwords
+chpasswd:
+  list: |
+    root:vagrant
+  expire: False
+
+# Add groups to the system
+# The following example adds the www-data group with members 'root' and 'vagrant'
+# and the empty group cloud-users.
+groups:
+  - www-data: [root,vagrant]
+  - cloud-users
+
+
+# Required so we can install VirtualBox Guest Additions later
+packages:
+  - kernel-devel
+  - kernel-headers
+  - gcc
+  - make
+  - perl
+  - bzip2
+  - mod_ssl
+
+# Amazon Linux is configured to download and install security updates at launch time.
+# This is controlled using the following cloud-init setting: repo_upgrade
+# - security (Apply outstanding updates that Amazon marks as security updates)
+# - bugfix (Apply updates that Amazon marks as bug fixes. Bug fixes are a larger set of updates, which include security updates and fixes for various other minor bugs)
+# - all (Apply all applicable available updates, regardless of their classification)
+# - none (Do not apply any updates to the instance on startup)
+repo_upgrade: none
+
+runcmd:
+
+  # The most effective way to clean free disk space on a Linux drive is to use the Linux dd utility which is a bit-stream duplicator
+  #- dd if=/dev/zero of=zerofillfile bs=1M
+  #- rm zerofillfile
+
+  # Stop cloud-init from randomizing root password on startup
+  - sed -i 's/.*root:RANDOM/#&/g' /etc/cloud/cloud.cfg.d/99_onprem.cfg
+
+  # Make it look like RedHat
+  - ln -s /etc/system-release /etc/redhat-release
