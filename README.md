@@ -1,6 +1,6 @@
 # README
 
-Running Amazon Linux 2 as a Virtual Machine On-Premises
+Running [Amazon Linux 2](https://aws.amazon.com/amazon-linux-2/) as a Virtual Machine On-Premises
 (VirtualBox)
 
 #### Getting started

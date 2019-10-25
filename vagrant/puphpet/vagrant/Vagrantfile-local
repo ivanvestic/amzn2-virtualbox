@@ -19,6 +19,10 @@ machines.each do |i, machine|
     # disable automatic box updates
     # https://www.vagrantup.com/docs/boxes/versioning.html
     machine_id.vm.box_check_update = false
+    # disable VirtualBox Guest Additions auto update
+    if Vagrant.has_plugin?('vagrant-vbguest')
+      machine_id.vbguest.auto_update = false
+    end
 
     if provider['box_version'].to_bool
       machine_id.vm.box_version = "#{provider['box_version']}"
